@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CARA – Crisis Assistance & Response Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white:       #ffffff;
+      --bg:          #eef6ff;
+      --blue-50:     #f0f8ff;
+      --blue-100:    #daeeff;
+      --blue-200:    #b3d9ff;
+      --blue-300:    #7ab8f5;
+      --blue-400:    #4a9de0;
+      --blue-500:    #1e7fc5;
+      --blue-600:    #155fa0;
+      --blue-700:    #0d3f70;
+      --text-dark:   #1a3a5c;
+      --text-mid:    #2e5f8a;
+      --text-light:  #6b98be;
+      --border:      #c8e2f8;
+      --shadow:      0 8px 32px rgba(30,127,197,0.12);
+      --shadow-sm:   0 2px 10px rgba(30,127,197,0.09);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 15% 5%, rgba(74,157,224,0.13) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 85% 95%, rgba(30,127,197,0.10) 0%, transparent 60%);
+    }
+
+    /* ─── PAGE TITLE ─── */
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--blue-600);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: fadeDown 0.5s ease;
+    }
+    .page-title span { font-size: 1.1rem; }
+
+    @keyframes fadeDown {
+      from { opacity:0; transform:translateY(-8px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ─── MAIN CARD ─── */
+    .chat-card {
+      width: 100%;
+      max-width: 800px;
+      height: 88vh;
+      max-height: 860px;
+      display: flex;
+      flex-direction: column;
+      background: var(--white);
+      border-radius: 26px;
+      box-shadow: 0 24px 72px rgba(30,127,197,0.16), 0 2px 8px rgba(30,127,197,0.06);
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      animation: cardUp 0.5s ease;
+    }
+    @keyframes cardUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ─── HEADER ─── */
+    .chat-header {
+      background: linear-gradient(130deg, var(--blue-500) 0%, var(--blue-400) 100%);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .chat-header::before {
+      content: '';
+      position: absolute;
+      top: -50px; right: -30px;
+      width: 150px; height: 150px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      pointer-events: none;
+    }
+    .chat-header::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: 35%;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      pointer-events: none;
+    }
+    .header-avatar {
+      width: 50px; height: 50px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(4px);
+    }
+    .header-text { flex: 1; }
+    .header-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: 0.02em;
+    }
+    .header-desc {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.78);
+      margin-top: 2px;
+    }
+    .header-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px;
+      padding: 5px 13px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 0.03em;
+      flex-shrink: 0;
+    }
+    .badge-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #5dffa8;
+      animation: blink 2s infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity:1; } 50% { opacity:0.4; }
+    }
+
+    /* ─── QUICK CHIPS ─── */
+    .quick-bar {
+      padding: 10px 18px;
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      background: var(--blue-50);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .quick-bar label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-light);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      width: 100%;
+      margin-bottom: 2px;
+    }
+    .chip {
+      background: var(--white);
+      border: 1.5px solid var(--blue-200);
+      border-radius: 20px;
+      padding: 5px 13px;
+      font-size: 0.73rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      color: var(--blue-500);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex; align-items: center; gap: 4px;
+      white-space: nowrap;
+    }
+    .chip:hover {
+      background: var(--blue-500);
+      color: var(--white);
+      border-color: var(--blue-500);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(30,127,197,0.2);
+    }
+
+    /* ─── MESSAGES ─── */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 22px 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--blue-200); border-radius: 4px; }
+
+    .msg-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      animation: msgPop 0.28s ease;
+    }
+    @keyframes msgPop {
+      from { opacity:0; transform: translateY(8px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .msg-row.user { flex-direction: row-reverse; }
+
+    .msg-avatar {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .msg-avatar.bot {
+      background: linear-gradient(135deg, var(--blue-400), var(--blue-500));
+    }
+    .msg-avatar.user {
+      background: var(--blue-100);
+      font-size: 14px;
+    }
+
+    .bubble {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.875rem;
+      line-height: 1.65;
+      font-weight: 400;
+    }
+    .bubble.bot {
+      background: var(--blue-50);
+      color: var(--text-dark);
+      border: 1px solid var(--blue-100);
+      border-bottom-left-radius: 5px;
+    }
+    .bubble.user {
+      background: linear-gradient(135deg, var(--blue-500), var(--blue-400));
+      color: var(--white);
+      border-bottom-right-radius: 5px;
+    }
+    .bubble strong { font-weight: 700; }
+    .bubble.bot strong { color: var(--blue-600); }
+
+    .msg-time {
+      font-size: 0.65rem;
+      color: var(--text-light);
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+    .msg-row.user .msg-time { text-align: right; }
+
+    .msg-col { display: flex; flex-direction: column; }
+    .msg-row.user .msg-col { align-items: flex-end; }
+
+    /* ─── TYPING INDICATOR ─── */
+    .typing-indicator {
+      display: none;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .typing-indicator.show { display: flex; }
+    .typing-bubble {
+      background: var(--blue-50);
+      border: 1px solid var(--blue-100);
+      border-radius: 18px;
+      border-bottom-left-radius: 5px;
+      padding: 14px 18px;
+      display: flex; gap: 5px; align-items: center;
+    }
+    .typing-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--blue-300);
+      animation: typingAnim 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingAnim {
+      0%,60%,100% { transform: translateY(0); opacity:0.5; }
+      30%          { transform: translateY(-6px); opacity:1; }
+    }
+
+    /* ─── EMERGENCY BANNER ─── */
+    .emergency-bar {
+      background: linear-gradient(90deg, #e8f4ff, #daeeff);
+      border-top: 1px solid var(--border);
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      color: var(--blue-600);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .emergency-bar span.icon { font-size: 1rem; }
+    .emergency-numbers { display: flex; gap: 14px; flex-wrap: wrap; }
+    .em-num { display: flex; align-items: center; gap: 4px; }
+    .em-num strong { color: var(--blue-700); font-size: 0.8rem; }
+
+    /* ─── INPUT AREA ─── */
+    .chat-input-area {
+      padding: 14px 18px 18px;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      background: var(--blue-50);
+      border: 1.5px solid var(--blue-200);
+      border-radius: 18px;
+      padding: 10px 14px;
+      transition: border-color 0.2s;
+    }
+    .input-row:focus-within {
+      border-color: var(--blue-400);
+      box-shadow: 0 0 0 3px rgba(74,157,224,0.12);
+    }
+    #user-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--text-dark);
+      resize: none;
+      outline: none;
+      max-height: 110px;
+      line-height: 1.5;
+    }
+    #user-input::placeholder { color: var(--text-light); font-weight: 400; }
+
+    #send-btn {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--blue-500), var(--blue-400));
+      color: var(--white);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.18s ease;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+    #send-btn:hover { transform: scale(1.06); box-shadow: 0 4px 14px rgba(30,127,197,0.3); }
+    #send-btn:active { transform: scale(0.97); }
+    #send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .input-hint {
+      font-size: 0.67rem;
+      color: var(--text-light);
+      margin-top: 7px;
+      padding-left: 4px;
+    }
+
+    /* ─── WELCOME MESSAGE ─── */
+    .welcome-card {
+      background: linear-gradient(135deg, var(--blue-50), var(--blue-100));
+      border: 1.5px solid var(--blue-200);
+      border-radius: 18px;
+      padding: 20px;
+      text-align: center;
+      animation: msgPop 0.4s ease;
+    }
+    .welcome-card .wc-icon { font-size: 2.4rem; margin-bottom: 8px; }
+    .welcome-card h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.05rem;
+      color: var(--blue-600);
+      margin-bottom: 6px;
+    }
+    .welcome-card p {
+      font-size: 0.82rem;
+      color: var(--text-mid);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-title">
+  <span>🛡️</span> Crisis Management System
+</div>
+
+<div class="chat-card">
+
+  <!-- HEADER -->
+  <div class="chat-header">
+    <div class="header-avatar">🚨</div>
+    <div class="header-text">
+      <div class="header-name">CARA</div>
+      <div class="header-desc">Crisis Assistance &amp; Response Assistant · Powered by Groq AI</div>
+    </div>
+    <div class="header-badge">
+      <div class="badge-dot"></div>
+      Active
+    </div>
+  </div>
+
+  <!-- QUICK CHIPS -->
+  <div class="quick-bar">
+    <label>Quick Topics</label>
+    <button class="chip" onclick="quickSend('🌊 Flood Emergency')">🌊 Flood</button>
+    <button class="chip" onclick="quickSend('🔥 Fire Emergency')">🔥 Fire</button>
+    <button class="chip" onclick="quickSend('🌍 Earthquake Safety')">🌍 Earthquake</button>
+    <button class="chip" onclick="quickSend('🌀 Cyclone Protocol')">🌀 Cyclone</button>
+    <button class="chip" onclick="quickSend('🏥 Medical Emergency steps')">🏥 Medical</button>
+    <button class="chip" onclick="quickSend('📋 Disaster Preparedness Checklist')">📋 Preparedness</button>
+    <button class="chip" onclick="quickSend('📞 Emergency contact numbers in India')">📞 Helplines</button>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="chat-messages" id="chat-messages">
+    <!-- Welcome Card -->
+    <div class="welcome-card">
+      <div class="wc-icon">🛡️</div>
+      <h2>Welcome to CARA</h2>
+      <p>I'm your Crisis Assistance &amp; Response Assistant. I can guide you through emergencies, natural disasters, and critical situations. Use the quick topics above or describe your situation below.</p>
+    </div>
+
+    <!-- Typing Indicator (hidden initially) -->
+    <div class="typing-indicator" id="typing-indicator">
+      <div class="msg-avatar bot">🤖</div>
+      <div class="typing-bubble">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMERGENCY BAR -->
+  <div class="emergency-bar">
+    <span class="icon">🆘</span>
+    <span>Emergency:</span>
+    <div class="emergency-numbers">
+      <div class="em-num"><span>General</span>&nbsp;<strong>112</strong></div>
+      <div class="em-num"><span>Police</span>&nbsp;<strong>100</strong></div>
+      <div class="em-num"><span>Fire</span>&nbsp;<strong>101</strong></div>
+      <div class="em-num"><span>Ambulance</span>&nbsp;<strong>108</strong></div>
+      <div class="em-num"><span>Disaster</span>&nbsp;<strong>1070</strong></div>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="chat-input-area">
+    <div class="input-row">
+      <textarea id="user-input" rows="1" placeholder="Describe your emergency or ask for guidance…"></textarea>
+      <button id="send-btn" onclick="sendMessage()" title="Send">➤</button>
+    </div>
+    <div class="input-hint">Press Enter to send &nbsp;·&nbsp; Shift+Enter for new line</div>
+  </div>
+
+</div>
+
+<script>
+  const messagesEl = document.getElementById('chat-messages');
+  const inputEl    = document.getElementById('user-input');
+  const sendBtn    = document.getElementById('send-btn');
+  const typingEl   = document.getElementById('typing-indicator');
+
+  // Keep conversation history for context
+  let conversationHistory = [];
+
+  // Auto-grow textarea
+  inputEl.addEventListener('input', () => {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = Math.min(inputEl.scrollHeight, 110) + 'px';
+  });
+
+  // Enter to send, Shift+Enter for newline
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  function getTime() {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function appendMessage(role, text) {
+    // Remove typing indicator if present
+    typingEl.classList.remove('show');
+
+    const isUser = role === 'user';
+    const row = document.createElement('div');
+    row.className = `msg-row ${isUser ? 'user' : ''}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = `msg-avatar ${isUser ? 'user' : 'bot'}`;
+    avatar.textContent = isUser ? '👤' : '🤖';
+
+    const col = document.createElement('div');
+    col.className = 'msg-col';
+
+    const bubble = document.createElement('div');
+    bubble.className = `bubble ${isUser ? 'user' : 'bot'}`;
+    bubble.innerHTML = formatText(text);
+
+    const time = document.createElement('div');
+    time.className = 'msg-time';
+    time.textContent = getTime();
+
+    col.appendChild(bubble);
+    col.appendChild(time);
+    row.appendChild(avatar);
+    row.appendChild(col);
+
+    // Insert before typing indicator
+    messagesEl.insertBefore(row, typingEl);
+    scrollBottom();
+  }
+
+  function formatText(text) {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br/>');
+  }
+
+  function scrollBottom() {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const msg = inputEl.value.trim();
+    if (!msg) return;
+
+    // Reset input
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    // Show user bubble
+    appendMessage('user', msg);
+
+    // Add to history
+    conversationHistory.push({ role: 'user', content: msg });
+
+    // Show typing
+    typingEl.classList.add('show');
+    messagesEl.insertBefore(typingEl, null);  // move to bottom
+    scrollBottom();
+
+    try {
+      const res = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: msg,
+          history: conversationHistory
+        })
+      });
+
+      const data = await res.json();
+      const reply = data.response || 'Sorry, I could not process that request.';
+
+      appendMessage('bot', reply);
+      conversationHistory.push({ role: 'assistant', content: reply });
+
+    } catch (err) {
+      typingEl.classList.remove('show');
+      appendMessage('bot', '⚠️ Connection error. Please check your network.\n\nFor emergencies, call **112** immediately.');
+    }
+
+    sendBtn.disabled = false;
+    inputEl.focus();
+  }
+
+  function quickSend(text) {
+    inputEl.value = text;
+    sendMessage();
+  }
+</script>
+</body>
+</html>
